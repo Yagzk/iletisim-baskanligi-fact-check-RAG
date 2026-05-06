@@ -94,7 +94,6 @@ Eşik değeri düşürülürse daha fazla vaka gelir ama alakasız sonuçlar art
 - **Kaynak:** T.C. Cumhurbaşkanlığı İletişim Başkanlığı Dezenformasyon Mücadele Merkezi
 - **Ham kayıt:** 2.810
 - **Temizleme sonrası:** ~1.300 benzersiz vaka
-- **Lisans:** CC BY 4.0
 - **Dil:** Türkçe
 
 ## 🔧 Veri Temizleme
