@@ -1,65 +1,118 @@
-# İletişim Başkanlığı Fact Check RAG
+# 🔍 İletişim Başkanlığı Fact-Check RAG
 
-A Retrieval-Augmented Generation (RAG) system for fact-checking content related to the Presidency of Communications (İletişim Başkanlığı).
+>  **Bu proje hâlâ test aşamasındadır. Eksiklikler ve hatalar olabilir.**
 
-## Overview
+T.C. Cumhurbaşkanlığı İletişim Başkanlığı'nın dezenformasyon bültenlerini kullanarak Türkçe iddiaları sorgulayan bir RAG (Retrieval-Augmented Generation) sistemi.
 
-This project implements a RAG-based fact-checking system that leverages retrieval and generation techniques to verify and validate information. The system combines document retrieval with language models to provide accurate fact-checking capabilities.
-
-## Features
-
-- **Retrieval-Augmented Generation**: Combines information retrieval with generative AI for accurate fact-checking
-- **Document Processing**: Efficient handling and indexing of large document collections
-- **Fact Verification**: Automated verification of claims against reliable sources
-- **Query Processing**: Advanced query understanding and processing
-
-## Project Structure
+## 🧠 Nasıl Çalışır?
 
 ```
-iletisim-baskanligi-fact-check-RAG/
-├── README.md
-├── [Add your project structure here]
-└── [Project files]
+Kullanıcı sorusu → Embedding → ChromaDB'den benzer vakalar → Llama 3.1 analiz → Cevap
 ```
 
-## Installation
+1. T.C. İletişim Başkanlığı'nın ~1.300 dezenformasyon vakası vektör veritabanına gömülür
+2. Kullanıcı bir iddia girer
+3. Sistem en benzer geçmiş vakaları cosine similarity ile bulur
+4. Llama 3.1 bu vakalara dayanarak iddianın dezenformasyon olup olmadığını analiz eder
 
-1. Clone the repository:
+## 📦 Teknoloji Stack
+
+| Bileşen | Teknoloji |
+|---|---|
+| Veri | [iletisim/dezenformasyon-bultenleri](https://huggingface.co/datasets/iletisim/dezenformasyon-bultenleri) |
+| Embedding | `paraphrase-multilingual-mpnet-base-v2` |
+| Vektör DB | ChromaDB (cosine similarity) |
+| LLM | Llama 3.1 8B (Ollama) |
+| Notebook | Jupyter / Google Colab |
+
+## 🚀 Kurulum
+
+### 1. Gereksinimler
+
 ```bash
-git clone https://github.com/Yagzk/iletisim-baskanligi-fact-check-RAG.git
-cd iletisim-baskanligi-fact-check-RAG
+pip install chromadb sentence-transformers pyarrow pandas ollama
 ```
 
-2. Install dependencies:
+### 2. Ollama & Llama 3.1
+
+[Ollama](https://ollama.com/download)'yı indirip kur, ardından:
+
 ```bash
-# Add installation instructions here
+ollama pull llama3.1
 ```
 
-## Usage
+### 3. Veriyi İndir
 
-[Add usage instructions and examples here]
+[Hugging Face](https://huggingface.co/datasets/iletisim/dezenformasyon-bultenleri)'den `train-00000-of-00001.parquet` dosyasını indirip proje klasörüne koy.
 
-## Requirements
+### 4. Notebook'u Çalıştır
 
-- Python 3.8+
-- [List other requirements]
+`app.ipynb` dosyasını açıp hücreleri sırayla çalıştır.
 
-## Contributing
+## 📁 Dosya Yapısı
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```
+├── app.ipynb                        # Ana notebook
+├── train-00000-of-00001.parquet     # Ham veri (Hugging Face'den indir)
+├── dezenformasyon_clean.parquet     # Temizlenmiş veri (notebook üretir)
+└── chroma_db/                       # Vektör veritabanı (notebook üretir)
+```
 
-## License
+## 💬 Kullanım
 
-[Add license information]
+```python
+rag_fact_check("Depremde baraj patladı")
+```
 
-## Author
+```
+🔍 Sorgu: Depremde baraj patladı
+============================================================
+📌 Bulunan Benzer Vakalar (3):
+  1. Deprem Sonrasında Atatürk Barajı'nda Çatlaklar Oluştu (skor: 0.68)
+  2. Osmaniye'deki Karaçay Barajı Patladı (skor: 0.59)
+  3. Erzincan İliç'teki Altın Madeninde Baraj Patladı (skor: 0.59)
 
-- **Yagzk** - [GitHub Profile](https://github.com/Yagzk)
+🤖 Analiz:
+Verilen geçmiş vakalar incelendiğinde bu iddia daha önce
+çürütülmüş benzer vakalarla örtüşmektedir...
+```
 
-## Support
+## ⚙️ Parametreler
 
-If you encounter any issues or have questions, please open an [issue](https://github.com/Yagzk/iletisim-baskanligi-fact-check-RAG/issues).
+```python
+rag_fact_check(
+    sorgu="iddia metni",
+    k=3,       # Kaç benzer vaka getirilsin
+    esik=0.5   # Minimum benzerlik skoru (0-1)
+)
+```
 
----
+Eşik değeri düşürülürse daha fazla vaka gelir ama alakasız sonuçlar artabilir.
 
-**Note**: This is a template README. Please update it with specific project details, installation instructions, and usage examples.
+## 📊 Veri Hakkında
+
+- **Kaynak:** T.C. Cumhurbaşkanlığı İletişim Başkanlığı Dezenformasyon Mücadele Merkezi
+- **Ham kayıt:** 2.810
+- **Temizleme sonrası:** ~1.300 benzersiz vaka
+- **Lisans:** CC BY 4.0
+- **Dil:** Türkçe
+
+## 🔧 Veri Temizleme
+
+Ham veride tespit edilen sorunlar ve çözümleri:
+
+- **Curly quote karakterleri** (`\u201c`, `\u201d`) → regex ile iddia başlığı çıkarıldı
+- **PDF parse kaynaklı satır kırıkları** → `\n` birleştirildi
+- **Bozuk `˿` karakterleri** → temizlendi
+- **Fact-check içine karışmış bülten metinleri** → iddia başlığında kesildi
+- **Duplicate vakalar** → en uzun fact-check tutulan versiyon korundu
+
+## 🗺️ Yol Haritası
+
+- [ ] Skor eşiği ayarlanabilir slider
+- [ ] Sorgu geçmişi
+- [ ] Türkçe embedding modeline geçiş
+
+## 📄 Lisans
+
+MIT
