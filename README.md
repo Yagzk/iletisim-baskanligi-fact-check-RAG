@@ -23,7 +23,7 @@ Kullanıcı sorusu → Embedding → ChromaDB'den benzer vakalar → Llama 3.1 a
 | Embedding | `paraphrase-multilingual-mpnet-base-v2` |
 | Vektör DB | ChromaDB (cosine similarity) |
 | LLM | Llama 3.1 8B (Ollama) |
-| Notebook | Jupyter / Google Colab |
+| Notebook | Jupyter |
 
 ## 🚀 Kurulum
 
