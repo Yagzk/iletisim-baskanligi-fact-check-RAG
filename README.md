@@ -106,6 +106,7 @@ Ham veride tespit edilen sorunlar ve çözümleri:
 - **Bozuk `˿` karakterleri** → temizlendi
 - **Fact-check içine karışmış bülten metinleri** → iddia başlığında kesildi
 - **Duplicate vakalar** → en uzun fact-check tutulan versiyon korundu
+- ** BU KISIM HALA GELİŞTİRME AŞAMASINDA **
 
 ## 🗺️ Yol Haritası
 
@@ -113,6 +114,4 @@ Ham veride tespit edilen sorunlar ve çözümleri:
 - [ ] Sorgu geçmişi
 - [ ] Türkçe embedding modeline geçiş
 
-## 📄 Lisans
 
-MIT
